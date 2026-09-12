@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Admin Portal (Python)",
+      "type": "shell",
+      "command": "python3 -m http.server 3000 --directory admin",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Run Admin Portal (Node)",
+      "type": "shell",
+      "command": "npx serve admin -l 3000",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Volunteer Connect",
+  "description": "Find, apply, and manage volunteering opportunities with real-time applications, organization dashboards, and messaging.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

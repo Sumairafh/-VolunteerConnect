@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volunteer Connect - Web Admin Portal</title>
+  <link rel="icon" type="image/png" href="assets/ic_volunteer_connect_emblem.png">
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons for clean UI -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js for beautiful analytics charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Authentication Overlay (Login & Sign Up for New Users) -->
+  <div id="auth-overlay" class="auth-overlay">
+    <div class="auth-card">
+      <div class="auth-header">
+        <img src="assets/ic_volunteer_connect_emblem.png" alt="Volunteer Connect" class="auth-brand-logo">
+        <h2 class="auth-title">Volunteer Connect</h2>
+        <p class="auth-subtitle">Portal Authentication &amp; User Access</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="tab-btn-signin" onclick="switchAuthTab('signin')">
+          <i class="fa-solid fa-right-to-bracket"></i> Sign In
+        </button>
+        <button type="button" class="auth-tab-btn" id="tab-btn-signup" onclick="switchAuthTab('signup')">
+          <i class="fa-solid fa-user-plus"></i> Register New User
+        </button>
+      </div>
+
+      <div class="auth-body">
+        <!-- Sign In Form -->
+        <form id="form-signin" onsubmit="handleSignIn(event)">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-input" id="signin-email" required placeholder="admin@volunteerconnect.org" value="admin@volunteerconnect.org">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="signin-password" required placeholder="••••••••" value="admin">
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 12.5px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-muted);">
+              <input type="checkbox" id="signin-remember" checked> Remember Session
+            </label>
+            <a href="javascript:void(0)" onclick="showToast('Use demo accounts or register new user below.', 'info')" style="color: var(--primary); text-decoration: none; font-weight: 500;">Forgot Password?</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 11px;">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Portal
+          </button>
+
+          <!-- Fast 1-Click Demo Logins -->
+          <div class="auth-demo-section">
+            <div class="demo-title"><i class="fa-solid fa-bolt"></i> 1-Click Quick Demo Access</div>
+            <div class="demo-btn-grid">
+              <button type="button" class="demo-chip" onclick="fillDemoLogin('admin')" title="Super Admin Account">
+                👑 Super Admin
+              </button>
+              <button type="button" class="demo-chip" onclick="fillDemoLogin('org')" title="Organization Representative">
+                🏢 NGO Lead
+              </button>
+              <button type="button" class="demo-chip" onclick="fillDemoLogin('vol')" title="Volunteer Coordinator">
+                🤝 Volunteer Lead
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Sign Up / Register New User Form -->
+        <form id="form-signup" onsubmit="handleSignUp(event)" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" id="signup-name" required placeholder="e.g. Zainab Malik">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-input" id="signup-email" required placeholder="zainab@example.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account Role</label>
+              <select class="form-select" id="signup-role" required>
+                <option value="VOLUNTEER">Volunteer</option>
+                <option value="ORGANIZATION">NGO / Organization</option>
+                <option value="SUPER_ADMIN">System Administrator</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="text" class="form-input" id="signup-phone" required placeholder="+92 300 1234567">
+            </div>
+            <div class="form-group">
+              <label class="form-label">City</label>
+              <select class="form-select" id="signup-city" required>
+                <option value="Karachi">Karachi</option>
+                <option value="Lahore">Lahore</option>
+                <option value="Islamabad">Islamabad</option>
+                <option value="Rawalpindi">Rawalpindi</option>
+                <option value="Peshawar">Peshawar</option>
+                <option value="Quetta">Quetta</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">CNIC / Registration ID</label>
+            <input type="text" class="form-input" id="signup-cnic" placeholder="42101-*******-7">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="signup-password" required placeholder="Create strong password">
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 11px;">
+            <i class="fa-solid fa-user-check"></i> Register Account &amp; Enter
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand-section">
+        <img src="assets/ic_volunteer_connect_emblem.png" alt="Volunteer Connect" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>Volunteer Connect <span class="brand-badge">Admin</span></h1>
+          <p class="brand-tagline">Linking People • Making Impact</p>
+        </div>
+      </div>
+
+      <nav class="nav-group">
+        <div class="nav-label">Core Management</div>
+        <a class="nav-item active" data-view="overview">
+          <i class="fa-solid fa-chart-pie icon"></i>
+          <span>Dashboard Overview</span>
+        </a>
+        <a class="nav-item" data-view="events">
+          <i class="fa-solid fa-calendar-check icon"></i>
+          <span>Events &amp; Items</span>
+          <span class="nav-badge" id="badge-events-count">6</span>
+        </a>
+        <a class="nav-item" data-view="users">
+          <i class="fa-solid fa-users-gear icon"></i>
+          <span>User Accounts</span>
+          <span class="nav-badge" id="badge-users-count">6</span>
+        </a>
+        <a class="nav-item" data-view="organizations">
+          <i class="fa-solid fa-building-ngo icon"></i>
+          <span>Organizations &amp; NGOs</span>
+          <span class="nav-badge warning" id="badge-pending-orgs">1</span>
+        </a>
+        <a class="nav-item" data-view="volunteers">
+          <i class="fa-solid fa-users icon"></i>
+          <span>Volunteers Directory</span>
+        </a>
+        <a class="nav-item" data-view="applications">
+          <i class="fa-solid fa-file-signature icon"></i>
+          <span>Applications Oversight</span>
+        </a>
+
+        <div class="nav-label" style="margin-top: 14px;">Safety &amp; Governance</div>
+        <a class="nav-item" data-view="reports">
+          <i class="fa-solid fa-shield-halved icon"></i>
+          <span>Reports &amp; Moderation</span>
+          <span class="nav-badge danger" id="badge-reports">1</span>
+        </a>
+        <a class="nav-item" data-view="broadcast">
+          <i class="fa-solid fa-bullhorn icon"></i>
+          <span>Broadcast Alerts</span>
+        </a>
+        <a class="nav-item" data-view="settings">
+          <i class="fa-solid fa-sliders icon"></i>
+          <span>Settings &amp; Data Sync</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-profile">
+          <div class="admin-avatar" id="sidebar-user-avatar">AD</div>
+          <div class="admin-info">
+            <div class="admin-name" id="sidebar-user-name">Super Administrator</div>
+            <div class="admin-role" id="sidebar-user-role"><span class="status-dot"></span> System Live</div>
+          </div>
+        </div>
+        <button type="button" class="sidebar-logout-btn" onclick="handleLogout()">
+          <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h2 class="view-title" id="page-title">Dashboard Overview</h2>
+          <div class="data-mode-badge" id="sync-status-indicator">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Local Synced State</span>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-user-pill">
+            <div class="topbar-user-avatar" id="topbar-avatar">AD</div>
+            <div class="topbar-user-details">
+              <div class="topbar-user-name" id="topbar-user-name">Super Admin</div>
+              <div class="topbar-user-role" id="topbar-user-role">Administrator</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="openCreateUserModal()">
+            <i class="fa-solid fa-user-plus"></i> New User
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="openCreateEventModal()">
+            <i class="fa-solid fa-plus"></i> New Item / Event
+          </button>
+          <button class="btn-logout btn-sm" onclick="handleLogout()" title="Log out from admin portal">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Content Panels -->
+      <div class="content-area">
+        
+        <!-- 1. OVERVIEW PANEL -->
+        <section id="view-overview" class="view-panel active">
+          <!-- 6 Stat Cards Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-info">
+                <h3>Total Volunteers</h3>
+                <div class="stat-number" id="stat-total-volunteers">1,420</div>
+                <div class="stat-subtext"><span style="color: var(--success);"><i class="fa-solid fa-arrow-up"></i> +12%</span> this month</div>
+              </div>
+              <div class="stat-icon-wrapper stat-icon-blue">
+                <i class="fa-solid fa-users"></i>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-info">
+                <h3>Active Events</h3>
+                <div class="stat-number" id="stat-active-events">6</div>
+                <div class="stat-subtext">Across 4 major cities</div>
+              </div>
+              <div class="stat-icon-wrapper stat-icon-green">
+                <i class="fa-solid fa-calendar-day"></i>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-info">
+                <h3>Verified NGOs</h3>
+                <div class="stat-number" id="stat-verified-orgs">28</div>
+                <div class="stat-subtext"><span style="color: var(--warning);" id="stat-pending-org-sub">1 pending verification</span></div>
+              </div>
+              <div class="stat-icon-wrapper stat-icon-purple">
+                <i class="fa-solid fa-building-ngo"></i>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-info">
+                <h3>Total Applications</h3>
+                <div class="stat-number" id="stat-total-applications">85</div>
+                <div class="stat-subtext"><span style="color: var(--info);">Max 2 active/user</span></div>
+              </div>
+              <div class="stat-icon-wrapper stat-icon-cyan">
+                <i class="fa-solid fa-file-signature"></i>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-info">
+                <h3>Impact Hours</h3>
+                <div class="stat-number" id="stat-total-hours">3,840</div>
+                <div class="stat-subtext">Verified community service</div>
+              </div>
+              <div class="stat-icon-wrapper stat-icon-yellow">
+                <i class="fa-solid fa-clock"></i>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-info">
+                <h3>Open Reports</h3>
+                <div class="stat-number" id="stat-open-reports" style="color: var(--danger);">1</div>
+                <div class="stat-subtext">Safety triage required</div>
+              </div>
+              <div class="stat-icon-wrapper stat-icon-red">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="dashboard-grid">
+            <div class="chart-card">
+              <div class="card-header-flex">
+                <div>
+                  <div class="card-title">Community Growth & Volunteering Hours</div>
+                  <div class="card-subtitle">Monthly signups and verified volunteer hours logged</div>
+                </div>
+              </div>
+              <div style="height: 280px; position: relative;">
+                <canvas id="growthChart"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="card-header-flex">
+                <div>
+                  <div class="card-title">Events by Category</div>
+                  <div class="card-subtitle">Focus areas distribution</div>
+                </div>
+              </div>
+              <div style="height: 280px; position: relative;">
+                <canvas id="categoryChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Urgent Tables -->
+          <div class="table-card" style="margin-bottom: 24px;">
+            <div class="table-toolbar">
+              <div class="card-title">🚨 Action Required: Pending Organization Approvals</div>
+              <button class="btn btn-secondary btn-sm" onclick="switchView('organizations')">View All Organizations</button>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Organization</th>
+                    <th>City & Contact</th>
+                    <th>Focus Mission</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="overview-pending-orgs-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. EVENTS MANAGEMENT PANEL -->
+        <section id="view-events" class="view-panel">
+          <div class="table-card">
+            <div class="table-toolbar">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="event-search-input" placeholder="Search events or items by title, category, or location..." oninput="filterEventsTable()">
+              </div>
+              <div class="filter-group">
+                <select class="filter-select" id="event-category-filter" onchange="filterEventsTable()">
+                  <option value="ALL">All Categories</option>
+                  <option value="Environmental">Environmental</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Education">Education</option>
+                  <option value="Food & Hunger Relief">Food & Hunger Relief</option>
+                  <option value="Animal Welfare">Animal Welfare</option>
+                  <option value="Disaster Relief">Disaster Relief</option>
+                </select>
+                <select class="filter-select" id="event-status-filter" onchange="filterEventsTable()">
+                  <option value="ALL">All Statuses</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="FULL">Full</option>
+                  <option value="COMPLETED">Completed</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="openCreateEventModal()">
+                  <i class="fa-solid fa-plus"></i> New Event / Item
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Item &amp; Event Title</th>
+                    <th>Hosting Organization</th>
+                    <th>Category</th>
+                    <th>Schedule &amp; City</th>
+                    <th>Capacity / Fill Rate</th>
+                    <th>Status</th>
+                    <th>Actions (Edit / Delete)</th>
+                  </tr>
+                </thead>
+                <tbody id="events-table-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. USER ACCOUNTS MANAGEMENT PANEL (CREATE / EDIT / DELETE USERS) -->
+        <section id="view-users" class="view-panel">
+          <div class="table-card">
+            <div class="table-toolbar">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="user-search-input" placeholder="Search users by name, email, phone, or CNIC..." oninput="filterUsersTable()">
+              </div>
+              <div class="filter-group">
+                <select class="filter-select" id="user-role-filter" onchange="filterUsersTable()">
+                  <option value="ALL">All Roles</option>
+                  <option value="SUPER_ADMIN">System Administrator</option>
+                  <option value="ORGANIZATION">Organization / NGO Lead</option>
+                  <option value="VOLUNTEER">Volunteer</option>
+                </select>
+                <select class="filter-select" id="user-status-filter" onchange="filterUsersTable()">
+                  <option value="ALL">All Account Statuses</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="SUSPENDED">Suspended</option>
+                  <option value="PENDING">Pending Verification</option>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="openCreateUserModal()">
+                  <i class="fa-solid fa-user-plus"></i> Add New User
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>User Profile</th>
+                    <th>Assigned Role</th>
+                    <th>City &amp; Contact</th>
+                    <th>Identity / CNIC</th>
+                    <th>Account Status</th>
+                    <th>Joined Date</th>
+                    <th>Management Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. ORGANIZATIONS MANAGEMENT PANEL -->
+        <section id="view-organizations" class="view-panel">
+          <div class="table-card">
+            <div class="table-toolbar">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="org-search-input" placeholder="Search NGOs by name, email, or city..." oninput="filterOrgsTable()">
+              </div>
+              <div class="filter-group">
+                <select class="filter-select" id="org-status-filter" onchange="filterOrgsTable()">
+                  <option value="ALL">All Statuses</option>
+                  <option value="VERIFIED">Verified</option>
+                  <option value="PENDING">Pending Approval</option>
+                  <option value="REJECTED">Rejected</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Organization</th>
+                    <th>Headquarters</th>
+                    <th>Official Contact</th>
+                    <th>Website / Profile</th>
+                    <th>Hosted Events</th>
+                    <th>Status</th>
+                    <th>Verification Action</th>
+                  </tr>
+                </thead>
+                <tbody id="orgs-table-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. VOLUNTEERS DIRECTORY PANEL -->
+        <section id="view-volunteers" class="view-panel">
+          <div class="table-card">
+            <div class="table-toolbar">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="volunteer-search-input" placeholder="Search by volunteer name or city..." oninput="filterVolunteersTable()">
+              </div>
+              <div class="filter-group">
+                <select class="filter-select" id="volunteer-city-filter" onchange="filterVolunteersTable()">
+                  <option value="ALL">All Cities</option>
+                  <option value="Karachi">Karachi</option>
+                  <option value="Lahore">Lahore</option>
+                  <option value="Islamabad">Islamabad</option>
+                  <option value="Rawalpindi">Rawalpindi</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Volunteer Name</th>
+                    <th>City & Phone</th>
+                    <th>Masked CNIC (Protected)</th>
+                    <th>Key Skills</th>
+                    <th>Completed Events</th>
+                    <th>Logged Hours</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="volunteers-table-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. APPLICATIONS OVERSIGHT PANEL -->
+        <section id="view-applications" class="view-panel">
+          <div class="table-card">
+            <div class="table-toolbar">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="app-search-input" placeholder="Search application by volunteer or event..." oninput="filterAppsTable()">
+              </div>
+              <div class="filter-group">
+                <select class="filter-select" id="app-status-filter" onchange="filterAppsTable()">
+                  <option value="ALL">All Application Statuses</option>
+                  <option value="PENDING">Pending Review</option>
+                  <option value="ACCEPTED">Accepted</option>
+                  <option value="REJECTED">Rejected</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Volunteer Applicant</th>
+                    <th>Applied Event</th>
+                    <th>Host Organization</th>
+                    <th>Applied Date</th>
+                    <th>Active Limit Status</th>
+                    <th>Status</th>
+                    <th>Admin Override</th>
+                  </tr>
+                </thead>
+                <tbody id="apps-table-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. REPORTS & MODERATION PANEL -->
+        <section id="view-reports" class="view-panel">
+          <div class="table-card">
+            <div class="table-toolbar">
+              <div class="card-title">Community Safety & Flagged Content</div>
+              <div class="filter-group">
+                <select class="filter-select" id="report-status-filter" onchange="filterReportsTable()">
+                  <option value="ALL">All Reports</option>
+                  <option value="OPEN">Open Investigation</option>
+                  <option value="RESOLVED">Resolved</option>
+                  <option value="DISMISSED">Dismissed</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Report ID & Type</th>
+                    <th>Reported Target</th>
+                    <th>Reported Reason / Detail</th>
+                    <th>Reporter</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Resolution Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="reports-table-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. BROADCAST ALERTS PANEL -->
+        <section id="view-broadcast" class="view-panel">
+          <div style="max-width: 680px; margin: 0 auto;">
+            <div class="table-card" style="padding: 24px;">
+              <h3 style="font-size: 17px; font-weight: 700; color: var(--navy-dark); margin-bottom: 6px;">
+                <i class="fa-solid fa-bullhorn" style="color: var(--primary);"></i> Send Platform Announcement
+              </h3>
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+                Broadcast instant push alerts and notifications to volunteers and partner organizations.
+              </p>
+
+              <form onsubmit="handleSendBroadcast(event)">
+                <div class="form-group">
+                  <label class="form-label">Target Audience</label>
+                  <select class="form-select" id="broadcast-audience">
+                    <option value="ALL">All App Users (Volunteers & Organizations)</option>
+                    <option value="VOLUNTEERS">Volunteers Only</option>
+                    <option value="ORGANIZATIONS">Organizations Only</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Alert Type</label>
+                  <select class="form-select" id="broadcast-type">
+                    <option value="EMERGENCY">🚨 Emergency Disaster Relief Appeal</option>
+                    <option value="SYSTEM">🔔 General Community Announcement</option>
+                    <option value="POLICY">📋 Policy & Verification Update</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Notification Title</label>
+                  <input type="text" class="form-input" id="broadcast-title" required placeholder="e.g. Urgent: Flood Relief Volunteer Drive in Sindh">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Message Content</label>
+                  <textarea class="form-textarea" id="broadcast-message" required placeholder="Provide clear briefing, location instructions, and emergency contact details..."></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+                  <button type="reset" class="btn btn-secondary">Clear</button>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-paper-plane"></i> Broadcast Now
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. SETTINGS & SYNC PANEL -->
+        <section id="view-settings" class="view-panel">
+          <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+            
+            <!-- Safety Limits Configuration -->
+            <div class="table-card" style="padding: 24px;">
+              <h3 class="card-title" style="margin-bottom: 8px;">
+                <i class="fa-solid fa-sliders" style="color: var(--primary);"></i> Platform Governance Rules
+              </h3>
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+                Adjust application limits and mobile app constraints enforced by security rules.
+              </p>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Max Active Applications per Volunteer</label>
+                  <input type="number" class="form-input" id="cfg-max-apps" value="2" min="1" max="10">
+                  <small style="color: var(--text-light); font-size: 11px;">Enforces active application limits on the Android app.</small>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Default Volunteer Minimum Age</label>
+                  <input type="number" class="form-input" id="cfg-min-age" value="16" min="12" max="25">
+                </div>
+              </div>
+
+              <button class="btn btn-primary btn-sm" onclick="saveGovernanceRules()">Save Rule Changes</button>
+            </div>
+
+            <!-- Firebase Firestore Connection -->
+            <div class="table-card" style="padding: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                  <h3 class="card-title">
+                    <i class="fa-brands fa-google" style="color: #EA4335;"></i> Firebase Firestore Live Connection
+                  </h3>
+                  <p style="font-size: 13px; color: var(--text-muted);">
+                    Connect this web admin panel directly to your Firebase project.
+                  </p>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="toggleFirebaseMode()" id="btn-toggle-firebase">
+                  Switch to Firebase Mode
+                </button>
+              </div>
+
+              <div id="firebase-config-box" style="margin-top: 14px; background: #F8FAFC; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Firebase Project ID</label>
+                    <input type="text" class="form-input" id="fb-project-id" placeholder="volunteer-connect-app">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Firebase Web API Key</label>
+                    <input type="text" class="form-input" id="fb-api-key" placeholder="AIzaSy...">
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="saveFirebaseConfig()">Save & Connect</button>
+              </div>
+            </div>
+
+            <!-- Data Export Card -->
+            <div class="table-card" style="padding: 24px;">
+              <h3 class="card-title" style="margin-bottom: 8px;">
+                <i class="fa-solid fa-file-export" style="color: var(--success);"></i> Export Platform Data
+              </h3>
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                Export verified records for external audit, NGO reports, and government compliance.
+              </p>
+              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" onclick="exportData('events')">
+                  <i class="fa-solid fa-file-csv"></i> Export Events / Items (CSV)
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="exportData('users')">
+                  <i class="fa-solid fa-file-csv"></i> Export Users (CSV)
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="exportData('volunteers')">
+                  <i class="fa-solid fa-file-csv"></i> Export Volunteers (CSV)
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="exportData('organizations')">
+                  <i class="fa-solid fa-file-csv"></i> Export Organizations (CSV)
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="exportData('applications')">
+                  <i class="fa-solid fa-file-csv"></i> Export Applications (CSV)
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="exportData('json')">
+                  <i class="fa-solid fa-download"></i> Full JSON Backup
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: ADD / EDIT EVENT / ITEM -->
+  <div class="modal-backdrop" id="modal-event">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-event-title">Create Volunteer Event / Item</h3>
+        <button class="btn-icon" onclick="closeModal('modal-event')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="handleSaveEvent(event)">
+        <div class="modal-body">
+          <input type="hidden" id="event-form-id">
+          <div class="form-group">
+            <label class="form-label">Event / Item Title</label>
+            <input type="text" class="form-input" id="event-form-title" required placeholder="e.g. Clifton Beach Plastic Cleanup Drive">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="event-form-category" required>
+                <option value="Environmental">Environmental</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Education">Education</option>
+                <option value="Food & Hunger Relief">Food & Hunger Relief</option>
+                <option value="Animal Welfare">Animal Welfare</option>
+                <option value="Disaster Relief">Disaster Relief</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hosting Organization</label>
+              <select class="form-select" id="event-form-org" required>
+                <!-- Populated via JS -->
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">City</label>
+              <select class="form-select" id="event-form-city" required>
+                <option value="Karachi">Karachi</option>
+                <option value="Lahore">Lahore</option>
+                <option value="Islamabad">Islamabad</option>
+                <option value="Rawalpindi">Rawalpindi</option>
+                <option value="Peshawar">Peshawar</option>
+                <option value="Quetta">Quetta</option>
+                <option value="Multan">Multan</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Capacity (Max Volunteers)</label>
+              <input type="number" class="form-input" id="event-form-capacity" value="40" min="5" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Date (e.g. Sep 25, 2026)</label>
+              <input type="text" class="form-input" id="event-form-date" required value="Sep 25, 2026">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Time (e.g. 09:00 AM - 01:00 PM)</label>
+              <input type="text" class="form-input" id="event-form-time" required value="09:00 AM - 01:00 PM">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Location / Address</label>
+              <input type="text" class="form-input" id="event-form-address" required placeholder="e.g. Sea View Promenade, Clifton Block 4">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-select" id="event-form-status">
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="FULL">FULL</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="CANCELLED">CANCELLED</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description &amp; Briefing</label>
+            <textarea class="form-textarea" id="event-form-desc" required placeholder="Detailed objective and volunteer duties..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-event')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-event">Save Event / Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT USER ACCOUNT -->
+  <div class="modal-backdrop" id="modal-user">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-user-title">Add New User Account</h3>
+        <button class="btn-icon" onclick="closeModal('modal-user')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="handleSaveUser(event)">
+        <div class="modal-body">
+          <input type="hidden" id="user-form-id">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" id="user-form-name" required placeholder="e.g. Tariq Mansoor">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-input" id="user-form-email" required placeholder="user@volunteerconnect.org">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account Role</label>
+              <select class="form-select" id="user-form-role" required>
+                <option value="SUPER_ADMIN">System Administrator</option>
+                <option value="ORGANIZATION">Organization Representative</option>
+                <option value="VOLUNTEER">Volunteer</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="text" class="form-input" id="user-form-phone" required placeholder="+92 300 1234567">
+            </div>
+            <div class="form-group">
+              <label class="form-label">City</label>
+              <select class="form-select" id="user-form-city" required>
+                <option value="Karachi">Karachi</option>
+                <option value="Lahore">Lahore</option>
+                <option value="Islamabad">Islamabad</option>
+                <option value="Rawalpindi">Rawalpindi</option>
+                <option value="Peshawar">Peshawar</option>
+                <option value="Quetta">Quetta</option>
+                <option value="Multan">Multan</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">CNIC / Registration ID</label>
+              <input type="text" class="form-input" id="user-form-cnic" placeholder="42101-*******-3">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account Status</label>
+              <select class="form-select" id="user-form-status" required>
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="SUSPENDED">SUSPENDED</option>
+                <option value="PENDING">PENDING</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="user-form-password" placeholder="Leave blank to keep current password">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Skills / Specialization (Comma-separated)</label>
+            <input type="text" class="form-input" id="user-form-skills" placeholder="e.g. First Aid, Crowd Management, Social Media">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-user')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-user">Save User Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VIEW DETAILS (DYNAMIC) -->
+  <div class="modal-backdrop" id="modal-details">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-details-title">Details View</h3>
+        <button class="btn-icon" onclick="closeModal('modal-details')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="modal-details-content">
+        <!-- Injected via JS -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-details')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Main JavaScript App -->
+  <script src="app.js"></script>
+</body>
+</html>
